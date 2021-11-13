@@ -16,7 +16,7 @@ public class NetClock {
         try
         {
             System.out.println("Hello");
-            servsock = new ServerSocket(10080, 300);
+            servsock = new ServerSocket(80, 300);
             while(true)
             {
                 sock = servsock.accept();
