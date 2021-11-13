@@ -112,7 +112,7 @@ public class UmiClient implements Runnable {
 	}
 
 	Socket server;
-	int port = 10000;
+	int port = 80;
 	BufferedReader in;
 	PrintWriter out;
 	String name;

@@ -3,7 +3,7 @@ import java.net.*;
 import java.util.*;
 
 public class UmiServer {
-	static final int DEFAULT_PORT = 10000;
+	static final int DEFAULT_PORT = 80;
 	static ServerSocket serverSocket;
 	static Vector connections;
 	static Vector energy_v;
