@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -17,32 +18,40 @@ public class UmiClient implements Runnable {
 		p.setLayout(new BorderLayout());
 
 		b = new Button("up");
-		b.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		b.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
 				sendCommand("up");
 			}
 		});
 		p.add(b, BorderLayout.NORTH);
 
 		b = new Button("left");
-		b.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		b.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
 				sendCommand("left");
 			}
 		});
 		p.add(b, BorderLayout.WEST);
 
 		b = new Button("right");
-		b.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		b.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
 				sendCommand("right");
 			}
 		});
 		p.add(b, BorderLayout.EAST);
 
 		b = new Button("down");
-		b.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		b.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
 				sendCommand("down");
 			}
 		});
@@ -54,23 +63,27 @@ public class UmiClient implements Runnable {
 		f.add(p);
 
 		b = new Button("login");
-		b.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		b.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
 				if(server == null) login();
 			}
 		});
 		f.add(b,BorderLayout.NORTH);
 
 		b = new Button("logout");
-		b.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		b.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
 				logout();
 			}
 		});
 		f.add(b,BorderLayout.SOUTH);
 
 		f.setSize(335,345);
-		f.show();
+		f.setVisible(true);
 	}
 
 	public void run(){
@@ -88,7 +101,8 @@ public class UmiClient implements Runnable {
 	TextField host, tf_name;
 	Dialog d;
 
-	void login(){
+	void login()
+	{
 		d = new Dialog(f, true);
 		host = new TextField(10) ;
 		tf_name = new TextField(10) ;
@@ -98,16 +112,19 @@ public class UmiClient implements Runnable {
 		d.add(new Label("name:"));
 		d.add(tf_name);
 		Button b = new Button("OK");
-		b.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		b.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
 				realLogin(host.getText(), tf_name.getText());
 				d.dispose();
+				d.setVisible(false);
 			}
 		});
 		d.add(b);
 		d.setResizable(true);
 		d.setSize(200, 150);
-		d.show();
+		d.setVisible(true);
 		(new Thread(this)).start();
 	}
 
@@ -127,6 +144,7 @@ public class UmiClient implements Runnable {
 
 			out.println("login " + name);
 			out.flush();
+			System.out.println("login");
 			repaint();
 		}catch(Exception e){
 			e.printStackTrace();
