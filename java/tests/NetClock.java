@@ -20,6 +20,7 @@ public class NetClock {
             while(true)
             {
                 sock = servsock.accept();
+                System.out.println("[*] socker accept.");
                 outstr = "hello";
                 out = sock.getOutputStream();
                 for(i = 0; i < outstr.length(); i++)
