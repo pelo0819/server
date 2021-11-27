@@ -5,14 +5,14 @@ import java.util.*;
 public class UmiServer {
 	static final int DEFAULT_PORT = 80;
 	static ServerSocket serverSocket;
-	static Vector connections;
-	static Vector energy_v;
-	static Hashtable userTable = null;
+	static Vector<Socket> connections;
+	static Vector<int[]> energy_v;
+	static Hashtable<String, Ship> userTable = null;
 	static Random random = null;
 
 	public static void addConnection(Socket s){
 		if (connections == null){
-			connections = new Vector();
+			connections = new Vector<Socket>();
 		}
 		connections.addElement(s);
 	}
@@ -25,7 +25,7 @@ public class UmiServer {
 
 	public static void loginUser(String name){
 		if (userTable == null){
-			userTable = new Hashtable();
+			userTable = new Hashtable<String, Ship>();
 		}
 		if (random == null){
 			random = new Random();
@@ -46,38 +46,38 @@ public class UmiServer {
 	}
 
 	public static void left(String name){
-		Ship ship = (Ship) userTable.get(name);
+		Ship ship = userTable.get(name);
 		ship.left();
 		calculation();
 	}
 
 	public static void right(String name){
-		Ship ship = (Ship) userTable.get(name);
+		Ship ship = userTable.get(name);
 		ship.right();
 		calculation();
 	}
 
 	public static void up(String name){
-		Ship ship = (Ship) userTable.get(name);
+		Ship ship = userTable.get(name);
 		ship.up();
 		calculation();
 	}
 
 	public static void down(String name){
-		Ship ship = (Ship) userTable.get(name);
+		Ship ship = userTable.get(name);
 		ship.down();
 		calculation();
 	}
 
 	static void calculation(){
 		if (userTable != null && energy_v != null){
-			for (Enumeration users = userTable.keys();
-				 users.hasMoreElements();) {
+			for (Enumeration<String> users = userTable.keys(); users.hasMoreElements();) 
+			{
 				String user = users.nextElement().toString();
-				Ship ship = (Ship) userTable.get(user);
-				for (Enumeration energys = energy_v.elements();
+				Ship ship = userTable.get(user);
+				for (Enumeration<int[]> energys = energy_v.elements();
 					 energys.hasMoreElements();) {
-					int[] e = (int []) energys.nextElement();
+					int[] e = energys.nextElement();
 					int x = e[0] - ship.x;
 					int y = e[1] - ship.y;
 					double r = Math.sqrt(x * x + y * y);
@@ -91,12 +91,13 @@ public class UmiServer {
 	}
 
 	public static void statInfo(PrintWriter pw){
+		System.out.println("[*] receive stat");
 		pw.println("ship_info");
 		if (userTable != null){
-			for (Enumeration users = userTable.keys();
+			for (Enumeration<String> users = userTable.keys();
 				 users.hasMoreElements();) {
 				String user = users.nextElement().toString();
-				Ship ship = (Ship) userTable.get(user);
+				Ship ship = userTable.get(user);
 				pw.println(user + " " + ship.x + " "
 								+ ship.y + " " + ship.point);
 			}
@@ -104,18 +105,19 @@ public class UmiServer {
 		pw.println(".");
 		pw.println("energy_info");
 		if (energy_v != null){
-			for (Enumeration energys = energy_v.elements();
+			for (Enumeration<int[]> energys = energy_v.elements();
 				 energys.hasMoreElements();) {
-				int[] e = (int []) energys.nextElement();
+				int[] e = energys.nextElement();
 				pw.println(e[0] + " " + e[1]);
 			}
 		}
+		pw.println(".");
 		pw.flush();
 	}
 
 	public static void putEnergy(){
 		if (energy_v == null){
-			energy_v = new Vector();
+			energy_v = new Vector<int[]>();
 		}
 		if (random == null){
 			random = new Random();
