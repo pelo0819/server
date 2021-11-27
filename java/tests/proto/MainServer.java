@@ -2,6 +2,10 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import servers.Ship;
+import servers.DbManager;
+import common.Constants;
+
 public class MainServer {
 	static final int DEFAULT_PORT = 80;
 	static ServerSocket serverSocket;
@@ -93,13 +97,13 @@ public class MainServer {
 				for (Enumeration<int[]> energys = energy_v.elements(); energys.hasMoreElements();) 
 				{
 					int[] e = energys.nextElement();
-					int x = e[0] - ship.x;
-					int y = e[1] - ship.y;
+					int x = e[0] - ship.getX();
+					int y = e[1] - ship.getY();
 					double r = Math.sqrt(x * x + y * y);
 					if (r < 10)
 					{
 						energy_v.removeElement(e);
-						ship.point++;
+						ship.addPoint(1);
 					}
 				}
 			}
@@ -115,7 +119,7 @@ public class MainServer {
 			{
 				String user = users.nextElement().toString();
 				Ship ship = userTable.get(user);
-				pw.println(user + " " + ship.x + " " + ship.y + " " + ship.point);
+				pw.println(user + " " + ship.getX() + " " + ship.getY() + " " + ship.getPoint());
 			}
 		}
 		pw.println(".");
@@ -156,6 +160,8 @@ public class MainServer {
 		try 
 		{
 			serverSocket = new ServerSocket(DEFAULT_PORT);
+			DbManager dbMgr = new DbManager();
+			dbMgr.connect();
 		}
 		catch (IOException e){
 			System.err.println("can't create server socket.");
@@ -272,41 +278,41 @@ class clientProc implements Runnable
 	}
 }
 
-class Ship 
-{
-	int x;
-	int y;
-	int point = 0;
+// class Ship 
+// {
+// 	int x;
+// 	int y;
+// 	int point = 0;
 
-	public Ship(int x, int y)
-	{
-		this.x = x;
-		this.y = y;
-	}
+// 	public Ship(int x, int y)
+// 	{
+// 		this.x = x;
+// 		this.y = y;
+// 	}
 
-	public void left()
-	{
-		x -= 10;
-		if (x < 0)
-			x += 256;
-	}
+// 	public void left()
+// 	{
+// 		x -= 10;
+// 		if (x < 0)
+// 			x += 256;
+// 	}
 
-	public void right()
-	{
-		x += 10;
-		x %= 256;
-	}
+// 	public void right()
+// 	{
+// 		x += 10;
+// 		x %= 256;
+// 	}
 
-	public void up()
-	{
-		y += 10;
-		y %= 256;
-	}
+// 	public void up()
+// 	{
+// 		y += 10;
+// 		y %= 256;
+// 	}
 
-	public void down()
-	{
-		y -= 10;
-		if (y < 0)
-			y += 256;
-	}
-}
+// 	public void down()
+// 	{
+// 		y -= 10;
+// 		if (y < 0)
+// 			y += 256;
+// 	}
+// }
