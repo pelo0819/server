@@ -6,93 +6,190 @@ import javax.swing.*;
 import java.net.*;
 import java.io.*;
 import java.util.*;
-import java.awt.image.BufferedImage;
 
-
-public class Main 
+public class Main implements Runnable
 {
-    public static void main(String[] arg){
-		// new UmiClient();
-		
+    Boolean isLoop = true;
+    Socket server;
+	BufferedReader in;
+	PrintWriter out;
+	String charaName;
+    PaintCanvas canvas = null;
+    Constants.State state;
+
+    public static void main(String[] arg)
+    {
+        new Main();
+	}
+
+    public Main()
+    {
         JFrame frame = new JFrame("Umi");
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 
-		JButton button = new JButton("up");
-		button.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-			}
-		});
-		panel.add(button, BorderLayout.NORTH);
+        SetButton("up",     BorderLayout.NORTH, panel);
+        SetButton("left",   BorderLayout.WEST,  panel);
+        SetButton("right",  BorderLayout.EAST,  panel);
+        SetButton("down",   BorderLayout.SOUTH, panel);
+        SetButton("login",  BorderLayout.NORTH, frame);
+        SetButton("logout", BorderLayout.SOUTH, frame);
 
 		frame.add(panel);
 
-        PaintCanvas canvas = new PaintCanvas(255, 255);
+        canvas = new PaintCanvas();
         panel.add(canvas);
 
-        Rectangle rect = new Rectangle(0, 0, 335, 345);
+        Rectangle rect = new Rectangle(0, 0, Constants.WIDTH_RECT, Constants.HEIGHT_RECT);
 		frame.setBounds(rect);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 
-	}
-}
+        setState(Constants.State.INIT);
 
-// キャンバスクラス
-class PaintCanvas extends Canvas
-{
-    int w = 0;
-    int h = 0;
-
-    private BufferedImage cImage = null;
-    private Graphics2D g2d;
-
-    private int x, y, xx, yy;
-    private int type;
-    public int width = 1;
-    // public Color c = Color.black;
-
-    public PaintCanvas(int width, int height) 
-    {
-        x = -1;
-        y = -1;
-        xx = -1;
-        yy = -1;
-        type = 0;
-
-        w = width;
-        h = height;
-
-        setSize(w, h);
-        setBackground(Color.GRAY);
-
-        cImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-        g2d = (Graphics2D) cImage.getGraphics();
-        // set background to white
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, w, h);
-
-        repaint();
     }
 
-    public void paint(Graphics g) 
+    public void run()
     {
-        
-        System.out.println("hello");
-        g2d.setColor(Color.RED);
-        g2d.fillOval(50, 50, 130, 30);
+        while(isLoop)
+        {
+            try{ Thread.sleep(Constants.SLEEP_TIME); }
+            catch(Exception e){}
 
-        g2d.setColor(Color.BLUE);
-        g2d.fillRect(50, 0, w/3, h/3);
-        
-        g.drawImage(cImage, 0, 0, null);
+            canvas.repaint();
+        }
         
     }
 
+    private void SetButton(String name, Object obj, JPanel panel)
+    {
+        JButton b = new JButton(name);
+        b.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+                sendCommand(name);
+			}
+		});
+		panel.add(b, obj);
+    }
 
+    private void SetButton(String name, Object obj, JFrame frame)
+    {
+        JButton b = new JButton(name);
+        b.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+                sendCommand(name, frame);
+			}
+		});
+		frame.add(b, obj);
+    }
 
+    private void sendCommand(String name)
+    {
+        if ("up".equals(name))
+        {
+            sendMoveCommand("up");
+		}
+        else if ("down".equals(name))
+        {
+            sendMoveCommand("down");
+		}
+        else if ("left".equals(name))
+        {
+            sendMoveCommand("left");
+		}
+        else if ("right".equals(name))
+        {
+            sendMoveCommand("right");
+		}
+    }
+
+    private void sendCommand(String name, JFrame frame)
+    {
+        if ("login".equals(name))
+        {
+            login(frame);
+        }
+        else if ("logout".equals(name))
+        {
+            logout();
+        }
+
+    }
+
+    private void sendMoveCommand(String dir)
+    {
+		System.out.println(dir);
+		out.println(dir);
+		out.flush();
+    }
+
+    private void login(JFrame frame)
+    {
+		System.out.println("login");
+        JDialog dialog = new JDialog(frame, true);
+        TextField charaName = new TextField(10);
+        dialog.setLayout(new GridLayout(3, 2));
+		dialog.add(new Label("name:"));
+		dialog.add(charaName);
+		Button button = new Button("OK");
+		button.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+                System.out.println("clicked OK.");
+                generateSocket(charaName.getText());
+				dialog.dispose();
+			}
+		});
+        dialog.add(button);
+        dialog.setResizable(true);
+		dialog.setSize(200, 150);
+		dialog.setVisible(true);
+        (new Thread(this)).start();
+    }
+
+    private void generateSocket(String charaName)
+    {
+        try
+        {
+            this.charaName = charaName;
+            server = new Socket(Constants.IP, Constants.PORT);
+            in = new BufferedReader( new InputStreamReader( server.getInputStream() ) );
+            out = new PrintWriter( server.getOutputStream() );
+
+            out.println("login " + charaName);
+            out.flush();
+            System.out.println("login");
+
+            canvas.setStream(in, out);
+            canvas.setMyName(charaName);
+            setState(Constants.State.UPDATE);
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private void logout()
+    {
+		System.out.println("logout");
+    }
+
+    private void setState(Constants.State state)
+    {
+        this.state = state;
+        if(canvas != null)
+        {
+            canvas.setState(state);
+        }
+    }
 
 }
