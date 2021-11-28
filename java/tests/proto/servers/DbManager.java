@@ -1,5 +1,7 @@
 package servers;
 
+import java.beans.Statement;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,6 +12,7 @@ public class DbManager
 {
     Connection con = null;
     PreparedStatement pstmt = null;
+    CallableStatement cs = null;
     ResultSet result = null;
 
     public DbManager(){}
@@ -23,15 +26,18 @@ public class DbManager
             String password = "";
             con = DriverManager.getConnection(url, user, password);
 
-            String sql = "select * from user";
-            pstmt = con.prepareStatement(sql);
+            String u = "kuma";
+            String mail = "";
+            String passwd = "hello";
 
-            result = pstmt.executeQuery();
+            String sql = "{CALL regist_user('"+ u + "', '" + mail + "', '" + passwd + "', ?)}";
+            cs = con.prepareCall(sql);
 
-            while(result.next())
-            {
-                System.out.println(result.getString("user_name"));
-            }
+            cs.registerOutParameter(1, java.sql.Types.INTEGER);
+            cs.executeUpdate();
+
+            System.out.println(cs.getInt(1));
+
         }
         catch(SQLException e)
         {
