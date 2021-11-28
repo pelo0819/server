@@ -6,8 +6,6 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
-// import proto.clients.PrintCanvas;
-// import proto.common.Constants;
 import clients.PaintCanvas;
 import common.*;
 
