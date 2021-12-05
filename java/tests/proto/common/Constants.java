@@ -32,6 +32,8 @@ public class Constants {
 
     public static final long SLEEP_TIME = 500;
 
+    public static final String DB_SERVER_INFO_PATH = "./servers/db_connect_info.pelo";
+
     
     
 }
